@@ -1,7 +1,7 @@
 package gift.auth;
 
 import gift.common.exception.NoAuthorizationHeaderException;
-import gift.common.exception.NoSuchEmailException;
+
 import gift.user.domain.User;
 import gift.user.service.UserService;
 import org.springframework.core.MethodParameter;
@@ -38,6 +38,6 @@ public class LoginUserArgumentResolver implements HandlerMethodArgumentResolver 
 
         String email = jwtProvider.getEmail(token);
 
-        return userService.findByEmail(email).orElseThrow(() -> new NoSuchEmailException("등록되지 않은 이메일입니다."));
+        return userService.findByEmail(email);
     }
 }

@@ -1,20 +1,20 @@
 package gift.wishlist;
 
-import java.util.UUID;
-
 public class WishlistSaveRequestDto {
 
-    private UUID productId;
+    private Long productId;
 
-    public WishlistSaveRequestDto(UUID productId) {
+    public WishlistSaveRequestDto() {}
+
+    public WishlistSaveRequestDto(Long productId) {
         this.productId = productId;
     }
 
-    public UUID getProductId() {
+    public Long getProductId() {
         return productId;
     }
 
-    public void setProductId(UUID productId) {
+    public void setProductId(Long productId) {
         this.productId = productId;
     }
 }

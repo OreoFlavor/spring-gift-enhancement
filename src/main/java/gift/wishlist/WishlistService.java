@@ -1,36 +1,41 @@
 package gift.wishlist;
 
-import gift.common.exception.NoSuchIdException;
+import gift.product.domain.Product;
+import gift.product.repository.ProductRepository;
+import gift.user.domain.User;
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.UUID;
 
 @Service
 public class WishlistService {
-    private final WishlistDao wishlistDao;
+    private final WishRepository wishRepository;
+    private final ProductRepository productRepository;
 
-    public WishlistService(WishlistDao wishlistDao) {
-        this.wishlistDao = wishlistDao;
+    public WishlistService(WishRepository wishRepository, ProductRepository productRepository) {
+        this.wishRepository = wishRepository;
+        this.productRepository = productRepository;
     }
 
     @Transactional
-    public List<Wishlist> getWishlistById(UUID userId) {
-        return wishlistDao.getWishlistByUserId(userId);
+    public List<Wishlist> getWishlistById(Long userId) {
+        return wishRepository.findByUserId(userId);
     }
 
     @Transactional
-    public Wishlist saveWishlist(UUID id, WishlistSaveRequestDto wishlistSaveRequestDto) {
-        Wishlist wishlist = new Wishlist(id, wishlistSaveRequestDto.getProductId());
-        return wishlistDao.save(wishlist);
+    public Wishlist createWishlist(User user, WishlistSaveRequestDto wishlistSaveRequestDto) {
+        Product product = productRepository.findById(wishlistSaveRequestDto.getProductId())
+                .orElseThrow(()-> new EntityNotFoundException("해당 ID가 존재하지 않습니다."));
+        Wishlist wishlist = new Wishlist(user, product);
+        return wishRepository.save(wishlist);
     }
 
     @Transactional
     public void deleteWishlist(Long id) {
-        if(wishlistDao.findById(id).isEmpty()) {
-            throw new NoSuchIdException("존재하지 않는 ID입니다.");
-        }
-        wishlistDao.delete(id);
+        Wishlist wishlist = wishRepository.findById(id)
+                .orElseThrow(()-> new EntityNotFoundException("해당 ID가 존재하지 않습니다."));
+        wishRepository.delete(wishlist);
     }
 }
