@@ -5,6 +5,10 @@ import gift.product.dto.ProductPatchRequestDto;
 import gift.product.dto.ProductSaveRequestDto;
 import gift.product.repository.ProductRepository;
 import jakarta.persistence.*;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -28,6 +32,11 @@ public class ProductService {
     }
 
     @Transactional(readOnly = true)
+    public Page<Product> findAllByPage(Pageable pageable) {
+        return productRepository.findAll(pageable);
+    }
+
+    @Transactional(readOnly = true)
     public List<Product> findAll() {
         return productRepository.findAll();
     }
@@ -42,10 +51,7 @@ public class ProductService {
     public Product updateProduct(Long id, ProductPatchRequestDto productPatchRequestDto) {
         Product product = productRepository.findById(id)
                 .orElseThrow(()->new EntityNotFoundException("해당 ID가 존재하지 않습니다."));
-
-        Product updateProduct = new Product(product.getId(), productPatchRequestDto.getName(), productPatchRequestDto.getPrice(), productPatchRequestDto.getImageUrl());
-        entityManager.merge(updateProduct);
-        return updateProduct;
+        return productRepository.save(new Product(product.getId(), productPatchRequestDto.getName(), productPatchRequestDto.getPrice(), productPatchRequestDto.getImageUrl()));
     }
 
     @Transactional

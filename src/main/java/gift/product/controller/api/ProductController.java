@@ -6,6 +6,10 @@ import gift.product.dto.ProductSaveRequestDto;
 import gift.product.dto.ResponseDto;
 import gift.product.service.ProductService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -28,6 +32,15 @@ public class ProductController {
                 .map(ResponseDto::new)
                 .toList();
         return ResponseEntity.ok(responseDtoList);
+    }
+
+    @GetMapping("/product/page")
+    public ResponseEntity<Page<ResponseDto>> findAllByPage(
+            @PageableDefault(page = 0, size = 10, sort = "id", direction = Sort.Direction.ASC) Pageable pageable
+            ) {
+        Page<ResponseDto> responseDtoPage = productService.findAllByPage(pageable)
+                .map(ResponseDto::new);
+        return ResponseEntity.ok(responseDtoPage);
     }
 
     @PostMapping("/product/add")
