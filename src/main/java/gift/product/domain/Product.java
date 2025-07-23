@@ -2,6 +2,9 @@ package gift.product.domain;
 
 import jakarta.persistence.*;
 
+import java.util.ArrayList;
+import java.util.List;
+
 @Entity
 @Table(name = "product")
 public class Product {
@@ -18,13 +21,24 @@ public class Product {
 
     private String imageUrl;
 
+    @OneToMany(mappedBy = "product", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<ProductOption> options;
+
     protected Product() {}
+
 
     public Product(Long id, String name, Integer price, String imageUrl) {
         this.id = id;
         this.name = name;
         this.price = price;
         this.imageUrl = imageUrl;
+    }
+
+    public Product(String name, Integer price, String imageUrl, List<ProductOption> options) {
+        this.name = name;
+        this.price = price;
+        this.imageUrl = imageUrl;
+        this.options = options;
     }
 
     public Product(String name, Integer price, String imageUrl) {
@@ -54,6 +68,16 @@ public class Product {
         this.imageUrl = newImageUrl;
     }
 
+    public void addOption(ProductOption productOption) {
+        for(ProductOption option : options) {
+            if (option.getName().equals(productOption.getName())) {
+                throw new IllegalArgumentException("이미 존재하는 옵션입니다.");
+            }
+        }
+        productOption.setProduct(this);
+        options.add(productOption);
+    }
+
     public Long getId() {
 
         return id;
@@ -69,5 +93,9 @@ public class Product {
 
     public String getImageUrl() {
         return imageUrl;
+    }
+
+    public List<ProductOption> getOptions() {
+        return options;
     }
 }
